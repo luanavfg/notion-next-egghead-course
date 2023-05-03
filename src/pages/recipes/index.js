@@ -1,7 +1,12 @@
 import { Client } from "@notionhq/client";
+import Link from "next/link";
 
 const RecipePage = ({ recipes }) => {
-  return recipes.map((recipe) => <p>{recipe}</p>);
+  return recipes.map((recipe) => (
+    <p key={recipe.id}>
+      <Link href={`/recipes/${recipe.id}`}>{recipe.title}</Link>
+    </p>
+  ));
 };
 
 export const getStaticProps = async () => {
@@ -15,7 +20,10 @@ export const getStaticProps = async () => {
   const recipes = [];
   data.results.forEach((result) => {
     if (result.type === "child_page") {
-      recipes.push(result.child_page.title);
+      recipes.push({
+        title: result.child_page.title,
+        id: result.id,
+      });
     }
   });
 
