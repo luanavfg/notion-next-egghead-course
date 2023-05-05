@@ -1,10 +1,11 @@
 import { Client } from "@notionhq/client";
 import Link from "next/link";
+import slugify from "slugify";
 
 const RecipePage = ({ recipes }) => {
   return recipes.map((recipe) => (
-    <p key={recipe.id}>
-      <Link href={`/recipes/${recipe.id}`}>{recipe.title}</Link>
+    <p key={recipe}>
+      <Link href={`/recipes/${slugify(recipe).toLowerCase()}`}>{recipe}</Link>
     </p>
   ));
 };
@@ -20,10 +21,7 @@ export const getStaticProps = async () => {
   const recipes = [];
   data.results.forEach((result) => {
     if (result.type === "child_page") {
-      recipes.push({
-        title: result.child_page.title,
-        id: result.id,
-      });
+      recipes.push(result.child_page.title);
     }
   });
 
