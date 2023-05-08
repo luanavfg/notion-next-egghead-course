@@ -1,17 +1,31 @@
 import { Client } from "@notionhq/client";
 import { useState } from "react";
+import axios from "axios";
 
 const Movies = ({ movies }) => {
-  console.log("movies.length", movies.length);
   const [movie, setMovie] = useState(null);
   const chooseMovie = () => {
     const chooseRandomNumber = Math.floor(Math.random() * movies.length);
     setMovie(movies[chooseRandomNumber]);
   };
+
+  const handleUpdate = async () => {
+    const { data } = await axios.post("/api/mark-as-watched", {
+      id: movie.id,
+      isWatched: true,
+    });
+    console.log("data", data);
+  };
+
   return (
     <>
       <button onClick={chooseMovie}>Choose Movie</button>
-      {movie && <pre>{JSON.stringify(movie, null, 2)}</pre>}
+      {movie && (
+        <>
+          <pre>{JSON.stringify(movie, null, 2)}</pre>
+          <button onClick={handleUpdate}>Watch!</button>
+        </>
+      )}
     </>
   );
 };
