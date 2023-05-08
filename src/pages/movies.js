@@ -14,7 +14,6 @@ const Movies = ({ movies }) => {
       id: movie.id,
       isWatched: true,
     });
-    console.log("data", data);
   };
 
   return (
@@ -26,6 +25,9 @@ const Movies = ({ movies }) => {
           <button onClick={handleUpdate}>Watch!</button>
         </>
       )}
+      {movies.map((m) => (
+        <p key={m.id}>{m.title}</p>
+      ))}
     </>
   );
 };
@@ -45,6 +47,9 @@ export const getStaticProps = async () => {
         equals: false,
       },
     },
+    sort: {
+      timestamp: "created_time",
+    },
   });
 
   results = [...data.results];
@@ -56,6 +61,9 @@ export const getStaticProps = async () => {
         checkbox: {
           equals: false,
         },
+      },
+      sort: {
+        timestamp: "created_time",
       },
       start_cursor: data.next_cursor,
     });
@@ -74,6 +82,7 @@ export const getStaticProps = async () => {
     props: {
       movies,
     },
+    revalidate: 60,
   };
 };
 export default Movies;
