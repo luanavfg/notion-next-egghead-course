@@ -2,6 +2,7 @@ import { Client } from "@notionhq/client";
 import { useState } from "react";
 
 const Movies = ({ movies }) => {
+  console.log("movies.length", movies.length);
   const [movie, setMovie] = useState(null);
   const chooseMovie = () => {
     const chooseRandomNumber = Math.floor(Math.random() * movies.length);
@@ -20,7 +21,9 @@ export const getStaticProps = async () => {
     auth: process.env.NOTION_SECRET,
   });
 
-  const data = await notion.databases.query({
+  let results = [];
+
+  let data = await notion.databases.query({
     database_id: process.env.DATABASE_ID,
     filter: {
       property: "Watched",
@@ -30,7 +33,22 @@ export const getStaticProps = async () => {
     },
   });
 
-  const movies = data.results.map((movie) => ({
+  results = [...data.results];
+  while (data.has_more) {
+    data = await notion.databases.query({
+      database_id: process.env.DATABASE_ID,
+      filter: {
+        property: "Watched",
+        checkbox: {
+          equals: false,
+        },
+      },
+      start_cursor: data.next_cursor,
+    });
+    results = [...results, ...data.results];
+  }
+
+  const movies = results.map((movie) => ({
     id: movie.id,
     title: movie.properties.Title.title[0].plain_text,
     categories: movie.properties.Categories.multi_select.map(
